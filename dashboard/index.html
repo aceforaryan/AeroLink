@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroLink Dashboard</title>
+    <meta name="description" content="AeroLink Swarm Intelligence and Communication Dashboard">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="top-nav">
+            <div class="logo">
+                <h1>AEROLINK</h1>
+                <span class="badge">Swarm C2</span>
+            </div>
+            <div class="mission-status active">
+                <div class="pulse"></div>
+                Mission Active
+            </div>
+        </header>
+
+        <main class="dashboard-grid">
+            <section class="card topology-view" id="topologyView">
+                <header class="card-header">
+                    <h2>Swarm Topology</h2>
+                    <button class="btn-action" id="btnRefresh">Refresh</button>
+                </header>
+                <div class="card-body">
+                    <div class="placeholder-map">
+                        <p>Live Node Map Simulation</p>
+                        <!-- Node elements will be injected here via JS -->
+                        <div class="node-container" id="nodeContainer"></div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="sidebar">
+                <section class="card rf-intel" id="rfIntelligence">
+                    <header class="card-header">
+                        <h2>RF Intelligence</h2>
+                    </header>
+                    <div class="card-body">
+                        <div class="metric">
+                            <span class="label">Anomaly Score</span>
+                            <span class="value" id="anomalyScore">0.02</span>
+                        </div>
+                        <div class="chart-placeholder">
+                            <div class="bar" style="height: 20%;"></div>
+                            <div class="bar" style="height: 35%;"></div>
+                            <div class="bar" style="height: 15%;"></div>
+                            <div class="bar" style="height: 80%; background: var(--accent-danger);"></div>
+                            <div class="bar" style="height: 25%;"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card event-feed" id="eventFeed">
+                    <header class="card-header">
+                        <h2>Autonomous Events</h2>
+                    </header>
+                    <div class="card-body feed-list" id="feedList">
+                        <!-- Events injected via JS -->
+                        <div class="feed-item info">System Initialized. Awaiting telemetry...</div>
+                    </div>
+                </section>
+            </aside>
+        </main>
+        
+        <footer class="controls">
+            <button class="btn-danger" id="btnFailNode">Inject Node Failure</button>
+            <button class="btn-warning" id="btnDegradeLink">Degrade Link</button>
+            <button class="btn-secondary" id="btnAnomaly">RF Anomaly</button>
+        </footer>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
