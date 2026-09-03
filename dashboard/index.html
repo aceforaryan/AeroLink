@@ -3,77 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AeroLink Dashboard</title>
-    <meta name="description" content="AeroLink Swarm Intelligence and Communication Dashboard">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>AeroLink — Swarm Resilience & C2 Dashboard</title>
+    <meta name="description" content="AeroLink: Autonomous Self-Healing Drone Swarm Resilience & Dynamic Topology C2">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        <header class="top-nav">
-            <div class="logo">
-                <h1>AEROLINK</h1>
-                <span class="badge">Swarm C2</span>
+    <div class="dashboard-wrapper">
+        <!-- Top Tactical Navigation Bar -->
+        <header class="tactical-header">
+            <div class="header-left">
+                <div class="brand-badge">
+                    <span class="pulse-ring"></span>
+                    <span class="pulse-dot"></span>
+                </div>
+                <div class="brand-text">
+                    <div class="brand-title">AEROLINK <span class="version-tag">v2.4 RESILIENCE LAYER</span></div>
+                    <div class="brand-subtitle">AUTONOMOUS SWARM MESH TOPOLOGY & RF INTELLIGENCE</div>
+                </div>
             </div>
-            <div class="mission-status active">
-                <div class="pulse"></div>
-                Mission Active
+
+            <div class="header-center">
+                <div class="mission-pill">
+                    <span class="mission-label">MISSION</span>
+                    <span class="mission-value" id="headerMissionName">DISASTER RESPONSE COMM COVERAGE</span>
+                    <span class="mission-dot"></span>
+                    <span class="mission-status-text" id="headerMissionStatus">ACTIVE</span>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="telemetry-clock">
+                    <span class="clock-label">C2 LINK</span>
+                    <span class="clock-status online" id="c2ConnectionStatus">CONNECTED (0.8s)</span>
+                </div>
+                <button class="btn-refresh" id="btnManualRefresh" title="Force Telemetry Sync">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                </button>
             </div>
         </header>
 
-        <main class="dashboard-grid">
-            <section class="card topology-view" id="topologyView">
-                <header class="card-header">
-                    <h2>Swarm Topology</h2>
-                    <button class="btn-action" id="btnRefresh">Refresh</button>
-                </header>
-                <div class="card-body">
-                    <div class="placeholder-map">
-                        <p>Live Node Map Simulation</p>
-                        <!-- Node elements will be injected here via JS -->
-                        <div class="node-container" id="nodeContainer"></div>
+        <!-- Main Workspace Grid -->
+        <main class="tactical-grid">
+            <!-- Left & Center: Tactical Map & Dynamic Topology -->
+            <section class="panel map-panel">
+                <div class="panel-header">
+                    <div class="panel-title-group">
+                        <svg class="panel-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                        <h2>LIVE SWARM TOPOLOGY & MESH GRAPH</h2>
                     </div>
+                    <div class="map-legend">
+                        <span class="legend-item"><span class="legend-dot gw"></span>Gateway</span>
+                        <span class="legend-item"><span class="legend-dot relay"></span>Relay</span>
+                        <span class="legend-item"><span class="legend-dot worker"></span>Worker</span>
+                        <span class="legend-item"><span class="legend-dot degraded"></span>Degraded / Offline</span>
+                        <span class="legend-item"><span class="legend-line active-route"></span>Active Route</span>
+                    </div>
+                </div>
+
+                <div class="canvas-container" id="canvasContainer">
+                    <canvas id="topologyCanvas"></canvas>
+                    <div class="hud-overlay top-left">
+                        <span class="hud-coord">SYS.G(V,E) DYNAMIC MESH</span>
+                        <span class="hud-sub" id="activeRouteDisplay">ROUTE: UAV-1 ➔ UAV-2 ➔ UAV-5</span>
+                    </div>
+                    <div class="hud-overlay bottom-right">
+                        <span class="hud-coord">COORDINATE SPACE: 1000m × 1000m</span>
+                        <span class="hud-sub">SCALE: 1px = 1.25m | 3D PROJECTION</span>
+                    </div>
+                    <!-- Node Tooltip Popup -->
+                    <div class="node-tooltip" id="nodeTooltip"></div>
                 </div>
             </section>
 
-            <aside class="sidebar">
-                <section class="card rf-intel" id="rfIntelligence">
-                    <header class="card-header">
-                        <h2>RF Intelligence</h2>
-                    </header>
-                    <div class="card-body">
-                        <div class="metric">
-                            <span class="label">Anomaly Score</span>
-                            <span class="value" id="anomalyScore">0.02</span>
+            <!-- Right Sidebar: Analytics, RF & Event Feed -->
+            <aside class="sidebar-panels">
+                <!-- Swarm Health KPI Matrix -->
+                <section class="panel health-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <svg class="panel-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            <h2>SWARM HEALTH METRICS</h2>
                         </div>
-                        <div class="chart-placeholder">
-                            <div class="bar" style="height: 20%;"></div>
-                            <div class="bar" style="height: 35%;"></div>
-                            <div class="bar" style="height: 15%;"></div>
-                            <div class="bar" style="height: 80%; background: var(--accent-danger);"></div>
-                            <div class="bar" style="height: 25%;"></div>
+                        <span class="badge-status healthy" id="swarmOverallHealth">HEALTHY</span>
+                    </div>
+
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <span class="kpi-label">ACTIVE / NODES</span>
+                            <div class="kpi-value-row">
+                                <span class="kpi-val" id="kpiActiveNodes">5</span>
+                                <span class="kpi-sub">/ 5</span>
+                            </div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" id="barActiveNodes" style="width: 100%;"></div></div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <span class="kpi-label">PACKET DELIVERY (PDR)</span>
+                            <div class="kpi-value-row">
+                                <span class="kpi-val highlight" id="kpiPdr">98.4%</span>
+                                <span class="kpi-tag" id="pdrTrend">TARGET >95%</span>
+                            </div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill success" id="barPdr" style="width: 98%;"></div></div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <span class="kpi-label">AVG MESH LATENCY</span>
+                            <div class="kpi-value-row">
+                                <span class="kpi-val" id="kpiLatency">32.4</span>
+                                <span class="kpi-sub">ms</span>
+                            </div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" id="barLatency" style="width: 25%;"></div></div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <span class="kpi-label">TOPOLOGY STATUS</span>
+                            <div class="kpi-value-row">
+                                <span class="kpi-val text-sm" id="kpiTopology">CONNECTED</span>
+                            </div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill success" id="barTopology" style="width: 100%;"></div></div>
                         </div>
                     </div>
                 </section>
 
-                <section class="card event-feed" id="eventFeed">
-                    <header class="card-header">
-                        <h2>Autonomous Events</h2>
-                    </header>
-                    <div class="card-body feed-list" id="feedList">
-                        <!-- Events injected via JS -->
-                        <div class="feed-item info">System Initialized. Awaiting telemetry...</div>
+                <!-- RF Intelligence & PSD Spectrum -->
+                <section class="panel rf-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <svg class="panel-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 16v-4M12 16V8M17 16v-2"/></svg>
+                            <h2>RF SPECTRUM & EWMA BASELINE</h2>
+                        </div>
+                        <span class="rf-badge-status" id="rfAnomalyBadge">BASELINE NORMAL</span>
+                    </div>
+
+                    <div class="rf-container">
+                        <div class="spectrum-chart-wrapper">
+                            <canvas id="spectrumCanvas" height="85"></canvas>
+                        </div>
+                        <div class="spectrum-footer">
+                            <span class="spec-leg"><span class="leg-color psd"></span>Instantaneous PSD |X[k]|²</span>
+                            <span class="spec-leg"><span class="leg-color baseline"></span>EWMA Baseline B[k]</span>
+                            <span class="spec-leg"><span class="leg-color threshold"></span>Threshold D[k] > 10.0</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Autonomous Closed-Loop Event Feed -->
+                <section class="panel feed-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <svg class="panel-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                            <h2>AUTONOMOUS DECISION FEED</h2>
+                        </div>
+                        <span class="feed-count-badge" id="feedCount">AUTO-LOG</span>
+                    </div>
+
+                    <div class="feed-list" id="eventFeedList">
+                        <!-- Dynamic event items injected here -->
                     </div>
                 </section>
             </aside>
         </main>
-        
-        <footer class="controls">
-            <button class="btn-danger" id="btnFailNode">Inject Node Failure</button>
-            <button class="btn-warning" id="btnDegradeLink">Degrade Link</button>
-            <button class="btn-secondary" id="btnAnomaly">RF Anomaly</button>
+
+        <!-- Bottom Deterministic Failure Injection Console -->
+        <footer class="tactical-footer">
+            <div class="console-label">
+                <span class="console-icon">⚡</span>
+                <div class="console-text">
+                    <span class="console-title">DETERMINISTIC FAILURE INJECTION & EVALUATION</span>
+                    <span class="console-subtitle">TRIGGER PRE-PROGRAMMED ATTRITION CONDITIONS FOR JUDGING & DEMONSTRATION</span>
+                </div>
+            </div>
+
+            <div class="action-button-group">
+                <button class="c2-btn btn-danger" id="btnFailRelay">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    FAIL PRIMARY RELAY (UAV-2)
+                </button>
+
+                <button class="c2-btn btn-warning" id="btnDegradeLink">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+                    DEGRADE GATEWAY LINK
+                </button>
+
+                <button class="c2-btn btn-anomaly" id="btnTriggerAnomaly">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    INJECT RF ANOMALY
+                </button>
+
+                <button class="c2-btn btn-reset" id="btnResetSwarm">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                    RESET SWARM FORMATION
+                </button>
+            </div>
         </footer>
     </div>
+
     <script src="app.js"></script>
 </body>
 </html>
