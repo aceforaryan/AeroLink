@@ -1,30 +1,39 @@
+from typing import Dict
+from swarm.state import SwarmNodeState
+
 class RoleManager:
     """
     Manages the dynamic assignment of roles to drones within the swarm.
-    Roles: GATEWAY, RELAY, WORKER, BACKUP RELAY, DEGRADED.
+    Roles: Gateway, Relay, Worker, Backup, Degraded.
     """
     
     def __init__(self):
-        self.node_roles = {}
-        
-    def score_relay_candidate(self, node_state: dict, weights: dict) -> float:
-        """
-        Calculates a deterministic score for a node to become a relay.
-        Score = w1*LinkQuality + w2*Battery + w3*PositionFit + w4*Reliability - w5*EnergyCost
-        """
-        w1 = weights.get('link_quality', 1.0)
-        w2 = weights.get('battery', 1.0)
-        w3 = weights.get('position_fit', 1.0)
-        w4 = weights.get('reliability', 1.0)
-        w5 = weights.get('energy_cost', 1.0)
-        
-        # Placeholder for actual calculation
-        return (w1 * node_state.get('link_quality', 0) +
-                w2 * node_state.get('battery', 0) -
-                w5 * 10)
-                
-    def assign_roles(self, swarm_state: dict):
-        """
-        Evaluates the swarm state and triggers role transitions if necessary.
-        """
         pass
+
+    def evaluate_role(self, node: SwarmNodeState) -> str:
+        """
+        Evaluates the node's state and determines its appropriate role.
+        """
+        if node.health == "Offline":
+            return "Offline"
+
+        if node.health == "Degraded" or node.battery < 15.0:
+            return "Degraded"
+
+        # If it's a designated Gateway, it shouldn't change unless failed
+        if node.role == "Gateway":
+            return "Gateway"
+
+        # Basic role assignment based on battery and link quality, 
+        # actual relay selection is driven by SwarmDecisionEngine.
+        return node.role
+
+    def transition_role(self, node: SwarmNodeState, new_role: str):
+        """
+        Transitions the node to a new role.
+        """
+        old_role = node.role
+        if old_role != new_role:
+            node.role = new_role
+            # Could trigger an event or log here
+            print(f"Node {node.node_id} transitioned from {old_role} to {new_role}")
